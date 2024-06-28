@@ -18,7 +18,7 @@
         <img src="{{ p.foto.url }}" alt="producto">
         <h2>{{ p.nombre | title }}</h2>
         <p>${{ p.precio | intcomma }}</p>
-        <p>ID: 1234</p>
+        <p>ID: {{ p.id }}</p>
         <button class="product-button">Agregar al carro</button>
     </a>
 </div>

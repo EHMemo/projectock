@@ -22,7 +22,7 @@
 
                             {% csrf_token %}
                             {{ form | crispy }}
-                            <a href="{% url "index" %}">Ir al inicio</a> | 
+                            <a href="{% url "home" %}">Ir al inicio</a> | 
                             <a href="{% url "register" %}">Registrarse</a>
                             <input type="submit" value="Iniciar sesion" class="btn btn-success float-end">
                         </form>

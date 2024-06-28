@@ -14,12 +14,14 @@
 <div class="product-grid">
 <!-- Carta 1 -->
 <div class="product-card">
-    <a href="https://url-del-producto-1.com">
+    <a href="{% url "verproducto" p.id %}">
         <img src="{{ p.foto.url }}" alt="producto">
         <h2>{{ p.nombre | title }}</h2>
         <p>${{ p.precio | intcomma }}</p>
-        <p>ID: 1234</p>
+        <p>ID: {{ p.id }}</p>
+        <a href="{% url "detalle_producto" p.id %}">
         <button class="product-button">Agregar al carro</button>
+        </a>
     </a>
 </div>
 

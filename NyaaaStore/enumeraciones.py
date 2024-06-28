@@ -1,8 +1,8 @@
 TIPO_PRODUCTO={
-    ("N", "SIN ESPECIFICAR"),
-    ("F", "FIGURA"),
-    ("P", "POLERA"),
-    ("A", "ACCESORIO"),
+    ("SIN ESPECIFICAR", "SIN ESPECIFICAR"),
+    ("FIGURA", "FIGURA"),
+    ("POLERA", "POLERA"),
+    ("ACCESORIO", "ACCESORIO"),
 }
 
 CIUDAD={

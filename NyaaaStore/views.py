@@ -9,14 +9,21 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from os import remove, path
 from django.conf import settings
+from django.utils import timezone
+from django.db.models import Q
 
 # Create your views here.
 
 # VIEWS PAGINA BASE
 
 def home(request):
+    
+    productos=Producto.objects.all() #queryset
+    datos = {
+        'productos' : productos
+    }
 
-    return render(request, 'NyaaaStore/home.html')
+    return render(request, 'NyaaaStore/home.html', datos)
 
 def cat_figuras(request):
 
@@ -42,7 +49,105 @@ def cat_accesorios(request):
     }
     return render(request, 'NyaaaStore/catalogo_accesorios.html', datos)
 
-#def carrito(request):
+def register(request):
+
+    data={
+        'form':UserForm()
+    }
+
+    if request.method=='POST':
+        formulario=UserForm(data=request.POST)
+        if formulario.is_valid():
+            formulario.save()
+            user=authenticate(username=formulario.cleaned_data["username"], password=formulario.cleaned_data["password1"])
+            login(request, user)
+            messages.success(request, "Logeo exitoso")
+            #redirige al index
+            return redirect(to='index')
+        data["form"]=formulario
+    return render(request, 'registration/register.html', data)
+
+def verproducto(request, id):
+    producto=get_object_or_404(Producto, id=id)
+    
+    datos={
+        "producto":producto
+    }
+
+    return render(request,'NyaaaStore/detalleproducto.html', datos)
+
+def exit(request):
+    logout(request)
+    
+    return redirect('home')
+
+@login_required
+def cart_detail(request):
+    cart, created = Cart.objects.get_or_create(usuario=request.user)
+    return render(request, 'NyaaaStore/cart_detail.html', {'cart': cart})
+
+@login_required
+def add_to_cart(request, producto_id):
+    producto = get_object_or_404(producto, id=producto_id)
+    cart, created = Cart.objects.get_or_create(usuario=request.user)
+
+    cart_item, created = CartItem.objects.get_or_create(producto=producto, precio_por_item=producto.precio)
+    if not created:
+        cart_item.cantidad += 1
+        cart_item.save()
+
+    cart.items.add(cart_item)
+    messages.success(request, f'{producto.nombre} fue añadido a tu carrito.')
+
+    return redirect('cart_detail')
+
+@login_required
+def update_cart_item(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    if request.method == 'POST':
+        cantidad = int(request.POST.get('cantidad', 1))
+        cart_item.cantidad = cantidad
+        cart_item.save()
+        messages.success(request, 'La cantidad fue actualizada.')
+    return redirect('cart_detail')
+
+@login_required
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    cart_item.delete()
+    messages.success(request, 'El ítem fue eliminado del carrito.')
+    return redirect('cart_detail')
+
+@login_required
+def process_payment(request):
+    cart, created = Cart.objects.get_or_create(usuario=request.user)
+    if not cart.items.exists():
+        messages.error(request, 'No tienes artículos en tu carrito.')
+        return redirect('cart_detail')
+
+    for item in cart.items.all():
+        producto = item.producto
+        if item.cantidad > producto.stock:
+            messages.error(request, f'No hay suficiente stock para {producto.nombre}.')
+            return redirect('cart_detail')
+        
+        Venta.objects.create(
+                usuario=request.user,
+                producto=producto,
+                cantidad=item.cantidad,
+                estado='pendiente',  # Estado inicial de la venta
+                fecha=timezone.now()
+            )
+        
+    for item in cart.items.all():
+        producto = item.producto
+        producto.stock -= item.cantidad
+        producto.save()
+
+    cart.items.clear()
+    
+    messages.success(request, 'Pago realizado con éxito. Gracias por tu compra.')
+    return redirect('cart_detail')
 
 # FIN VIEWS PAGINA BASE
 
@@ -54,6 +159,7 @@ def home_adm(request):
 
 # FORMULARIO ANIME
 
+@permission_required('NyaaaStore.view_anime')
 def listar_anime(request):
 
     anime=Anime.objects.all()
@@ -72,10 +178,11 @@ def listar_anime(request):
     
     return render(request, 'NyaaaStore/anime/listar.html', datos)
 
+@permission_required('NyaaaStore.add_anime')
 def agregar_anime(request):
 
     datos={
-        'form':AnimeForm()
+        'formanime':AnimeForm()
     }
 
     if request.method=="POST":
@@ -85,7 +192,7 @@ def agregar_anime(request):
             messages.success(request, "Anime agregado")
             return redirect(to="listar_anime")
         else:
-            datos["form"]=formulario
+            datos["formanime"]=formulario
 
     return render(request, 'NyaaaStore/anime/agregar.html', datos)
 
@@ -93,6 +200,7 @@ def agregar_anime(request):
 
 # FORMULARIO MARCA
 
+@permission_required('NyaaaStore.view_marca')
 def listar_marca(request):
 
     marca=Marca.objects.all()
@@ -111,6 +219,7 @@ def listar_marca(request):
     
     return render(request, 'NyaaaStore/marca/listar.html')
 
+@permission_required('NyaaaStore.add_marca')
 def agregar_marca(request):
 
     datos={
@@ -132,6 +241,7 @@ def agregar_marca(request):
 
 # FORMULARIO SERIE
 
+@permission_required('NyaaaStore.view_anime')
 def listar_serie(request):
 
     serie=Serie.objects.all()
@@ -149,7 +259,7 @@ def listar_serie(request):
     }
 
     return render(request, 'NyaaaStore/serie/listar.html', datos)
-
+@permission_required('NyaaaStore.add_anime')
 def agregar_serie(request):
 
     datos={
@@ -261,6 +371,7 @@ def eliminar_producto(request,id):
 
 # VIEWS CRUD USUARIOS DESDE ADMIN
 
+@permission_required('NyaaaStore.view_user')
 def listar_cliente(request):
 
     usuario=User.objects.all()
@@ -270,6 +381,7 @@ def listar_cliente(request):
     }
     return render(request, 'NyaaaStore/cliente/listar.html', datos)
 
+@permission_required('NyaaaStore.add_user')
 def agregar_cliente(request):
 
     datos={
@@ -287,6 +399,7 @@ def agregar_cliente(request):
 
     return render(request, 'NyaaaStore/cliente/agregar.html', datos)
 
+@permission_required('NyaaaStore.view_user')
 def detalle_cliente(request, id):
 
     usuario=get_object_or_404(User, id=id)
@@ -297,6 +410,7 @@ def detalle_cliente(request, id):
 
     return render(request, 'NyaaaStore/cliente/detalle.html', datos)
 
+@permission_required('NyaaaStore.change_user')
 def modificar_cliente(request, id):
 
     usuario = get_object_or_404(User, id=id)
@@ -317,6 +431,7 @@ def modificar_cliente(request, id):
 
     return render(request, 'NyaaaStore/cliente/modificar.html', datos)
 
+@permission_required('NyaaaStore.delete_user')
 def eliminar_cliente(request, id):
 
     usuario = get_object_or_404(User, id=id)
@@ -346,6 +461,6 @@ def exit(request):
 
 # VIEWS DE PEFIL USUARIO
 
-#def perfiluser(request):
+
 
 # FIN VIEWS DE PERFIL USUARIO

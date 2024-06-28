@@ -35,7 +35,7 @@ class Producto(models.Model):
     marca=models.ForeignKey(Marca, on_delete=models.PROTECT)
     serie=models.ForeignKey(Serie, on_delete=models.PROTECT)
     descripcion=models.TextField(max_length=5000, null=False)
-    tp_producto=models.CharField(max_length=1, choices=TIPO_PRODUCTO, default='SIN ESPECIFICAR')
+    tp_producto=models.CharField(max_length=10, choices=TIPO_PRODUCTO, default='SIN ESPECIFICAR')
     precio=models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(400000)])
     stock=models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     foto=models.ImageField(upload_to="productos", null=True)
@@ -51,7 +51,7 @@ class UserPerfil(models.Model):
     direccion=models.CharField(max_length=200, null=False)
 
 # MODELO CARRITO
-class CarritoItem(models.Model):
+class CartItem(models.Model):
     producto=models.ForeignKey('Producto', on_delete=models.CASCADE, verbose_name="Producto")
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_por_item = models.PositiveIntegerField(validators=[MinValueValidator(0)])
@@ -62,9 +62,9 @@ class CarritoItem(models.Model):
     def __str__(self):
         return f"{self.producto} - {self.cantidad} x {self.precio_por_item}"
     
-class Carrito(models.Model):
+class Cart(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Usuario", related_name="carts")
-    items = models.ManyToManyField(CarritoItem, verbose_name="Ítems", related_name="carts")
+    items = models.ManyToManyField(CartItem, verbose_name="Ítems", related_name="carts")
 
     def total(self):
         return sum([item.subtotal() for item in self.items.all()])

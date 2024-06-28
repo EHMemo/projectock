@@ -45,22 +45,22 @@ class UpdateUserPerfilForm(forms.ModelForm):
 class AnimeForm(forms.ModelForm):
 
     class Meta:
-        model=Anime
-        fields='__all__'
+        model = Anime
+        fields = ['nombre']
 
 # FORM PARA REGISTRO MARCA
 class MarcaForm(forms.ModelForm):
 
     class Meta:
-        model=Marca
-        fields='__all__'
+        model = Marca
+        fields = ['nombre']
 
 # FORM PARA REGISTRO SERIE
 class SerieForm(forms.ModelForm):
 
     class Meta:
-        model=Serie
-        fields='__all__'
+        model = Serie
+        fields = ['nombre']
 
 # FORM PARA ESTADO VENTAS
 class EstadoVentaForm(forms.ModelForm):
