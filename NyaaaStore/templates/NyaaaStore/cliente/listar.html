@@ -1,0 +1,51 @@
+{% extends "NyaaaStore/base-adm.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static "NyaaaStore/css/tabla.css" %}">
+{% endblock css %}
+
+{% block Contenido-adm %}
+
+<main>
+    <!-- Codigo para la tabla que muestra los usuarios -->
+    <div class="tabla">
+        <div class="titulo">
+            <h1>Registo de Clientes</h1>
+            <a href="{% url "agregar_cliente" %}" role="button" class="btn">+Agregar Cliente</a>
+        </div>
+        <table>
+            <caption>
+                Clientes
+                <span class="table-row-count"></span>
+            </caption>
+            <thead>
+                <tr>
+                    <th>IMAGEN</th>
+                    <th>RUT</th>
+                    <th>USERNAME</th>
+                    <th>NOMBRE</th>
+                    <th>APELLIDO</th>
+                    <th>EMAIL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clientes %}
+                <tr>
+                    <td><img src="{{c.foto.url}}" alt="foto" height="100"></td>
+                    <td>{{c.rut}}</td>
+                    <td>{{c.username}}</td>
+                    <td>{{c.nombre}}</td>
+                    <td>{{c.apellido}}</td>
+                    <td>{{c.email}}</td>
+                    <td><a href="{% url "detalle_cliente" c.rut %}" role="button" class="btn">Ver productos</a></td>
+                    <td><a href="{% url "eliminar_cliente" c.rut %}" role="button" class="btn">Eliminar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Codigo para la tabla que muestra los usuarios -->
+</main>
+
+{% endblock Contenido-adm %}

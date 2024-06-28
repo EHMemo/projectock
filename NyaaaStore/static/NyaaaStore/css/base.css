@@ -1,0 +1,106 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    position: relative;
+    background-color: #D0D0D0;
+    min-height: 100vh;
+    padding-bottom: 150px;
+}
+
+header {
+    background-color: dimgrey;
+    height: 85px;
+    padding: 5px 10%;
+}
+.logo {
+    text-align: center;
+}
+
+.logo a {
+    text-decoration: none;
+    color: black;
+}
+
+.navbar {
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-links li {
+    display: inline-block;
+    padding: 0 20px;
+}
+
+.nav-links li:hover {
+    transform: scale(1.1);
+    background-color: #717171;
+}
+
+.nav-links a {
+    font-size: 700;
+    color: black;
+    text-decoration: none;
+}
+
+.dropmenu {
+    position: absolute;
+    display: none;
+    list-style: none;
+    width: 200px;
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.nav-links li:hover .dropmenu{
+    display: block;
+}
+
+.dropmenu a:hover {
+    background-color: black;
+}
+
+.dropmenu a {
+    display: block;
+    color: white;
+    padding: 2px 2px 2px 10px;
+    text-decoration: none;
+}
+
+footer{
+    background-color: dimgrey;
+    height: 150px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.foo-link {
+    justify-content: space-around;
+    display: flex;
+    padding: 35px;
+}
+
+.foo-links h1 {
+    font-size: 15px;
+    padding-bottom: 4px;
+    color: black;
+}
+
+.foo-links p {
+    font-size: 14px;
+    padding-bottom: 4px;
+    color: gray;
+}
+
+.foo-links p a {
+    text-decoration: none;
+    color: black;
+}

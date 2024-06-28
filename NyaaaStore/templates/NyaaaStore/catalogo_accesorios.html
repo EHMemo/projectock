@@ -1,0 +1,30 @@
+{% extends "NyaaaStore/base.html" %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "NyaaaStore/css/catalogo.css" %}">
+{% endblock css %}
+
+{% block Contenido %}
+
+{% load humanize %}
+
+<main>
+    <!-- Contenedor de las cartas -->
+{% for p in productos %}
+<div class="product-grid">
+<!-- Carta 1 -->
+<div class="product-card">
+    <a href="https://url-del-producto-1.com">
+        <img src="{{ p.foto.url }}" alt="producto">
+        <h2>{{ p.nombre | title }}</h2>
+        <p>${{ p.precio | intcomma }}</p>
+        <p>ID: 1234</p>
+        <button class="product-button">Agregar al carro</button>
+    </a>
+</div>
+
+</div>
+{% endfor %}
+</main>
+
+{% endblock Contenido %}
